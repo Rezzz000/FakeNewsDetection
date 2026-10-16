@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fake News Detector</title>
+</head>
+<body>
+
+  <h1>Fake News Detector</h1>
+  <p>Masukkan teks berita di bawah untuk memeriksa apakah berita tersebut real atau fake.</p>
+
+  <textarea id="inputText" rows="10" cols="80" placeholder="Masukkan teks berita di sini..."></textarea>
+  <br><br>
+
+  <button onclick="predict()">Prediksi</button>
+
+  <br><br>
+  <div id="result"></div>
+
+  <script>
+    async function predict() {
+      const text = document.getElementById("inputText").value;
+
+      if (!text.trim()) {
+        document.getElementById("result").innerText = "Teks tidak boleh kosong.";
+        return;
+      }
+
+      document.getElementById("result").innerText = "Loading...";
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: text })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          document.getElementById("result").innerText = "Error: " + data.error;
+        } else {
+          document.getElementById("result").innerText =
+            "Hasil: " + data.prediction.toUpperCase() +
+            " (Confidence: " + data.confidence + "%)";
+        }
+      } catch (err) {
+        document.getElementById("result").innerText = "Gagal menghubungi server.";
+      }
+    }
+  </script>
+
+</body>
+</html>
